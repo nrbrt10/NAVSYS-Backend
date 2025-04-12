@@ -1,21 +1,13 @@
-import sqlite3
+from sqlmodel import create_engine, Session
 import os
 
 from backend import config
 
 class DatabaseHandler:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self):
+        db_path = os.path.join(config.DB_DIR, config.DB_NAME).replace("\\", "/")
+        self.db_url = f"sqlite:///{db_path}"
+        self.engine = create_engine(self.db_url, echo=True)
 
-    @classmethod
-    def init_db(self):
-        path = os.path.join(config.DB_DIR, config.DB_NAME)
-        if (path):
-            with sqlite3.connect(path) as conn:
-                conn.execute("select sqlite_version();")
-
-        self.path = path
-
-    async def run_query(self, query: str):
-        with sqlite3.connect(self.path) as conn:
-            conn.execute(query)
+    def get_session(self):
+        return Session(self.engine)
