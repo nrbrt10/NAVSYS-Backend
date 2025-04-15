@@ -1,4 +1,5 @@
 from sqlmodel import Field, SQLModel
+from sqlalchemy import Column, text, String
 from typing import Optional
 
 class Signals(SQLModel, table=True):
@@ -7,4 +8,7 @@ class Signals(SQLModel, table=True):
     x: str
     y: str
     z: str
-    dt: str | None = None
+    dt: Optional[str] = Field(
+        default=None,
+        sa_column=Column(String, server_default=text("datetime()"))
+    )
