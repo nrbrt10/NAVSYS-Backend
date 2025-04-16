@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
-from datetime import datetime
 
 from backend.models.signals import Signals
 from backend.schemas.signals import SignalCreate, SignalRead

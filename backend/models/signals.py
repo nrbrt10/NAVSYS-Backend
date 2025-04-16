@@ -1,6 +1,4 @@
-from sqlmodel import Field, SQLModel
-from sqlalchemy import Column, text, String
-from typing import Optional
+from . import Field, SQLModel, Column, text, String, Optional, datetime
 
 class Signals(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
