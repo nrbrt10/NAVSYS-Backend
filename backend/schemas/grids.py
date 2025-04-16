@@ -14,17 +14,16 @@ class GridRead(BaseModel):
     faction: str
     pilot: Optional[str]
 
-class GridPositionCreate(BaseModel):
-    id: int
+class Grid_PositionCreate(BaseModel):
     grid_id: int
-    x: str
-    y: str
-    z: str
+    x: float
+    y: float
+    z: float
 
-class GridPositionRead(BaseModel):
+class Grid_PositionRead(BaseModel):
     id: int
     grid_id: int
-    x: str
-    y: str
-    z: str
+    x: float
+    y: float
+    z: float
     timestamp: Optional[datetime]
