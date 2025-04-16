@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select
+from sqlmodel import select, join
 from datetime import datetime
 
 from backend.models.grids import Grids, Grid_Position
@@ -43,3 +43,9 @@ async def create_positions(position_list: list[Grid_PositionCreate]):
         for position in positions: session.refresh(position)
         return positions
     
+@router.get("/api/v1/grid_positions/latest/", response_model=Grid_PositionRead, tags="grid_positions")
+async def get_latest_position():
+    with db.get_session() as session:
+        statement = (select(Grid_Position).join(Grids, onclause=Grids.id == Grid_Position.grid_id))
+        positions = session.exec(statement)
+        return positions
