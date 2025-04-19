@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select, join
+from sqlmodel import select, join, func
 from datetime import datetime
 
 from backend.models.grids import Grids, Grid_Position
@@ -20,11 +20,15 @@ async def create_grids(grid_list: list[GridCreate]):
 
     grids = [Grids(**grid_data.model_dump(exclude_unset=True)) for grid_data in grid_list]
 
-    with db.get_session() as session:
-        session.add_all(grids)
-        session.commit()
-        for grid in grids: session.refresh(grid)
-        return grids
+    try:
+        with db.get_session() as session:
+            session.add_all(grids)
+            session.commit()
+            for grid in grids: session.refresh(grid)
+            return grids
+    except Exception as e:
+        print(e)
+    
 
 @router.get("/api/v1/grid_positions/", response_model=list[Grid_PositionRead], tags="grid_positions")
 async def get_positions(grid_id: int | None, timestamp: datetime | None):
@@ -43,9 +47,37 @@ async def create_positions(position_list: list[Grid_PositionCreate]):
         for position in positions: session.refresh(position)
         return positions
     
-@router.get("/api/v1/grid_positions/latest/", response_model=Grid_PositionRead, tags="grid_positions")
-async def get_latest_position():
+# @router.get("/api/v1/grid_positions/latest/", response_model=list[Grid_PositionRead], tags="grid_positions")
+# async def get_latest_position():
+#     with db.get_session() as session:
+#         statement = (
+#             select(Grid_Position, func.max(Grid_Position.timestamp).label("latest_timestamp")).join(Grids, onclause=Grids.uuid == Grid_Position.grid_uuid)
+#             ).group_by(Grid_Position.grid_uuid)
+#         positions = session.exec(statement).all()
+#         return positions
+    
+@router.get("/api/v1/grid_positions/latest/", response_model=list[Grid_PositionRead], tags=["grid_positions"])
+async def get_latest_positions():
     with db.get_session() as session:
-        statement = (select(Grid_Position).join(Grids, onclause=Grids.id == Grid_Position.grid_id))
-        positions = session.exec(statement)
-        return positions
+        # Subquery: latest timestamp per grid
+        subq = (
+            select(
+                Grid_Position.grid_uuid,
+                func.max(Grid_Position.timestamp).label("latest_timestamp")
+            )
+            .group_by(Grid_Position.grid_uuid)
+            .subquery()
+        )
+
+        # Main query: get full Grid_Position rows matching grid_uuid and timestamp
+        statement = (
+            select(Grid_Position)
+            .join(subq, onclause=(
+                (Grid_Position.grid_uuid == subq.c.grid_uuid) &
+                (Grid_Position.timestamp == subq.c.latest_timestamp)
+            ))
+        )
+
+        results = session.exec(statement).all()
+
+        return results

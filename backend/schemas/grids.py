@@ -1,28 +1,29 @@
 from . import BaseModel, Optional, datetime
 
 class GridCreate(BaseModel):
-    id: int
-    name: str
-    owner: str
-    faction: str
-    pilot: Optional[str]
+    uuid: str
+    entity_id: int
+    grid_name: str
+    owner_id: int
+    faction_tag: Optional[str]
+    pilot: Optional[str] = None
 
 class GridRead(BaseModel):
-    id: int
-    name: str
-    owner: str
-    faction: str
-    pilot: Optional[str]
+    uuid: str
+    entity_id: int
+    grid_name: str
+    owner_id: int
+    faction_tag: Optional[str]
+    pilot: Optional[str] = None
 
 class Grid_PositionCreate(BaseModel):
-    grid_id: int
+    grid_uuid: str
     x: float
     y: float
     z: float
 
 class Grid_PositionRead(BaseModel):
-    id: int
-    grid_id: int
+    grid_uuid: str
     x: float
     y: float
     z: float

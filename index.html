@@ -2,76 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ASTRA Grid View</title>
+  <title>3D Grid Position Map</title>
   <style>
-    body { margin: 0; overflow: hidden; }
-    #tooltip {
-      position: absolute;
-      background-color: rgba(0,0,0,0.75);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      pointer-events: none;
-      display: none;
-      font-family: monospace;
-    }
+    body { margin: 0; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <div id="tooltip"></div>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
+
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 10000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+    const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    const tooltip = document.getElementById('tooltip');
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const objects = [];
-
-    fetch("http://127.0.0.1:8000/api/v1/grid_positions/latest")
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(grid => {
-          const geometry = new THREE.SphereGeometry(10, 12, 12);
-          const material = new THREE.MeshBasicMaterial({ color: 0x33ccff });
-          const sphere = new THREE.Mesh(geometry, material);
-          sphere.position.set(+grid.x, +grid.y, +grid.z);
-          sphere.userData = { name: grid.name };
-          scene.add(sphere);
-          objects.push(sphere);
-        });
-      });
-
     camera.position.z = 1000;
 
+    // Simple function to fetch grid position data from your backend
+    async function fetchData() {
+      const res = await fetch('http://127.0.0.1:8000/api/v1/grid_positions/'); // Replace with your API endpoint
+      return await res.json();
+    }
+
+    // Create a simple cube to represent each grid position
+    function createCube(x, y, z) {
+      const geometry = new THREE.BoxGeometry(50, 50, 50);  // Cube size
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(geometry, material);
+      cube.position.set(x, y, z);
+      scene.add(cube);
+    }
+
+    // Setup scene with data from the backend
+    async function setupScene() {
+      const data = await fetchData();
+      data.forEach(item => {
+        createCube(item.x, item.y, item.z);
+      });
+    }
+
+    // Run the scene setup
+    setupScene();
+
+    // Render loop
     function animate() {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     }
+
     animate();
-
-    // Hover logic
-    window.addEventListener('mousemove', (event) => {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(objects);
-
-      if (intersects.length > 0) {
-        const obj = intersects[0].object;
-        tooltip.style.display = 'block';
-        tooltip.textContent = obj.userData.name;
-        tooltip.style.left = event.clientX + 10 + 'px';
-        tooltip.style.top = event.clientY + 10 + 'px';
-      } else {
-        tooltip.style.display = 'none';
-      }
-    });
   </script>
 </body>
 </html>

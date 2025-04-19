@@ -15,3 +15,13 @@ print(response.json())
 url = "http://127.0.0.1:8000/api/v1/grid_positions/latest/"
 response = r.get(url)
 print(response.json())
+
+
+data = [
+    {"uuid":"129448123554376162_144115188075855895_Sudentor MK1.7.3 Dawson CS","entity_id":129448123554376162,"grid_name":"Sudentor MK1.7.3 Dawson CS","owner_id":144115188075855895,"faction_tag":"PBC"},
+    {"uuid":"96113300194743417_144115188075855895_Large Grid 5409","entity_id":96113300194743417,"grid_name":"Large Grid 5409","owner_id":144115188075855895,"faction_tag":"PBC"}
+    ]
+
+url = "http://127.0.0.1:8000/api/v1/grids/"
+response = r.post(url, data)
+print(response.json())

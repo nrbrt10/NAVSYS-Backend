@@ -1,15 +1,17 @@
 from . import Field, SQLModel, Column, text, String, Optional, datetime
 
 class Grids(SQLModel, table=True):
-    id: int = Field(primary_key=True)
-    name: str
-    owner: str
-    faction: Optional[str] = Field(default=None) 
+    uuid: str = Field(primary_key=True)
+    entity_id: str
+    grid_name: str
+    owner_id: str
+    faction_tag: Optional[str] = Field(default=None) 
     pilot: Optional[str] = Field(default=None)
+    
 
 class Grid_Position(SQLModel, table=True):
-    id: int = Field(default=None, primary_key=True)
-    grid_id: int = Field(foreign_key="grids.id")
+    id: Optional[int] = Field(default=None, primary_key=True)
+    grid_uuid: str = Field(foreign_key="grids.uuid")
     x: str
     y: str
     z: str

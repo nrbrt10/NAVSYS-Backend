@@ -21,4 +21,5 @@ class DatabaseHandler:
 
 if __name__ == '__main__':
     db_handler = DatabaseHandler()
+    db_handler.drop_tables()
     db_handler.create_tables()
