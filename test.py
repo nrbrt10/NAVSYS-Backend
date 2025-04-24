@@ -16,6 +16,7 @@ url = "http://127.0.0.1:8000/api/v1/grid_positions/latest/"
 response = r.get(url)
 print(response.json())
 
+response
 
 data = [
     {"uuid":"129448123554376162_144115188075855895_Sudentor MK1.7.3 Dawson CS","entity_id":129448123554376162,"grid_name":"Sudentor MK1.7.3 Dawson CS","owner_id":144115188075855895,"faction_tag":"PBC"},
@@ -23,5 +24,5 @@ data = [
     ]
 
 url = "http://127.0.0.1:8000/api/v1/grids/"
-response = r.post(url, data)
+response = r.post(url, json=data)
 print(response.json())

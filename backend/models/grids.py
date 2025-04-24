@@ -9,12 +9,12 @@ class Grids(SQLModel, table=True):
     pilot: Optional[str] = Field(default=None)
     
 
-class Grid_Position(SQLModel, table=True):
+class Grid_Positions(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     grid_uuid: str = Field(foreign_key="grids.uuid")
     x: str
     y: str
     z: str
-    timestamp: Optional[datetime] = Field(
+    created_at: Optional[datetime] = Field(
         sa_column=Column(String, server_default=text("datetime()"))
     )

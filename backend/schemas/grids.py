@@ -1,6 +1,6 @@
 from . import BaseModel, Optional, datetime
 
-class GridCreate(BaseModel):
+class GridsCreate(BaseModel):
     uuid: str
     entity_id: int
     grid_name: str
@@ -8,7 +8,7 @@ class GridCreate(BaseModel):
     faction_tag: Optional[str]
     pilot: Optional[str] = None
 
-class GridRead(BaseModel):
+class GridsRead(BaseModel):
     uuid: str
     entity_id: int
     grid_name: str
@@ -16,15 +16,24 @@ class GridRead(BaseModel):
     faction_tag: Optional[str]
     pilot: Optional[str] = None
 
-class Grid_PositionCreate(BaseModel):
+class Grid_PositionsCreate(BaseModel):
     grid_uuid: str
     x: float
     y: float
     z: float
 
-class Grid_PositionRead(BaseModel):
+class Grid_PositionsRead(BaseModel):
     grid_uuid: str
     x: float
     y: float
     z: float
-    timestamp: Optional[datetime]
+    created_at: Optional[datetime]
+
+class Latest_PositionsRead(BaseModel):
+    uuid: str
+    grid_name: str
+    x: float
+    y: float
+    z: float
+    created_at: Optional[datetime]
+    

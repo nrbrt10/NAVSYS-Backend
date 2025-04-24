@@ -2,21 +2,21 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import select, join, func
 from datetime import datetime
 
-from backend.models.grids import Grids, Grid_Position
-from backend.schemas.grids import GridCreate, GridRead, Grid_PositionRead, Grid_PositionCreate
+from backend.models.grids import Grids, Grid_Positions
+from backend.schemas.grids import GridsCreate, GridsRead, Grid_PositionsRead, Grid_PositionsCreate, Latest_PositionsRead
 from backend.db.db_manager import DatabaseHandler
 
 router = APIRouter()
 db = DatabaseHandler()
 
-@router.get("/api/v1/grids/", response_model=list[GridRead], tags="grids")
+@router.get("/api/v1/grids/", response_model=list[GridsRead], tags="grids")
 async def get_grids(id: int | None, name: str | None, owner: str | None, faction: str | None):
     with db.get_session() as session:
         grids = session.exec(select(Grids)).all()
         return grids
     
-@router.post("/api/v1/grids/", response_model=list[GridRead], tags="grids")
-async def create_grids(grid_list: list[GridCreate]):
+@router.post("/api/v1/grids/", response_model=list[GridsRead], tags="grids")
+async def create_grids(grid_list: list[GridsCreate]):
 
     grids = [Grids(**grid_data.model_dump(exclude_unset=True)) for grid_data in grid_list]
 
@@ -30,16 +30,16 @@ async def create_grids(grid_list: list[GridCreate]):
         print(e)
     
 
-@router.get("/api/v1/grid_positions/", response_model=list[Grid_PositionRead], tags="grid_positions")
+@router.get("/api/v1/grid_positions/", response_model=list[Grid_PositionsRead], tags="grid_positions")
 async def get_positions(grid_id: int | None, timestamp: datetime | None):
     with db.get_session() as session:
-        positions = session.exec(select(Grid_Position)).all()
+        positions = session.exec(select(Grid_Positions)).all()
         return positions
 
-@router.post("/api/v1/grid_positions/", response_model=list[Grid_PositionRead], tags="grid_positions")
-async def create_positions(position_list: list[Grid_PositionCreate]):
+@router.post("/api/v1/grid_positions/", response_model=list[Grid_PositionsRead], tags="grid_positions")
+async def create_positions(position_list: list[Grid_PositionsCreate]):
 
-    positions = [Grid_Position(**position_data.model_dump(exclude_unset=True)) for position_data in position_list]
+    positions = [Grid_Positions(**position_data.model_dump(exclude_unset=True)) for position_data in position_list]
 
     with db.get_session() as session:
         session.add_all(positions)
@@ -56,28 +56,53 @@ async def create_positions(position_list: list[Grid_PositionCreate]):
 #         positions = session.exec(statement).all()
 #         return positions
     
-@router.get("/api/v1/grid_positions/latest/", response_model=list[Grid_PositionRead], tags=["grid_positions"])
+@router.get("/api/v1/grid_positions/latest/", response_model=list[Latest_PositionsRead], tags=["grid_positions"])
 async def get_latest_positions():
     with db.get_session() as session:
-        # Subquery: latest timestamp per grid
-        subq = (
+        g = Grids
+        gp = Grid_Positions
+
+        cte = (
             select(
-                Grid_Position.grid_uuid,
-                func.max(Grid_Position.timestamp).label("latest_timestamp")
+                g.uuid,
+                g.grid_name,
+                gp.x,
+                gp.y,
+                gp.z,
+                gp.created_at
+
             )
-            .group_by(Grid_Position.grid_uuid)
-            .subquery()
+            .join(gp, g.uuid == gp.grid_uuid)
+            .cte('cte')
         )
 
-        # Main query: get full Grid_Position rows matching grid_uuid and timestamp
-        statement = (
-            select(Grid_Position)
-            .join(subq, onclause=(
-                (Grid_Position.grid_uuid == subq.c.grid_uuid) &
-                (Grid_Position.timestamp == subq.c.latest_timestamp)
-            ))
+        ts_filter = (
+            select(func.max(gp.created_at).label('max_ts'))
+            .cte('ts_filter')
         )
 
-        results = session.exec(statement).all()
+        query = (
+            select(
+            cte.c.uuid,
+            cte.c.grid_name,
+            cte.c.x,
+            cte.c.y,
+            cte.c.z,
+            cte.c.created_at
+            )
+                 .join(ts_filter, cte.c.created_at == ts_filter.c.max_ts)
+                 )
 
-        return results
+        results = session.exec(query).all()
+
+        return [
+            {
+                "uuid": row[0],
+                "grid_name": row[1],
+                "x": row[2],
+                "y": row[3],
+                "z": row[4],
+                "created_at": row[5]
+            }
+            for row in results
+        ]
