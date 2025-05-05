@@ -1,35 +1,37 @@
 from . import BaseModel, Optional, datetime
 
-class GridsCreate(BaseModel):
+class Grids_Create(BaseModel):
     uuid: str
     entity_id: int
+    static_grid: bool
     grid_name: str
     owner_id: int
     faction_tag: Optional[str]
     pilot: Optional[str] = None
 
-class GridsRead(BaseModel):
+class Grids_Read(BaseModel):
     uuid: str
     entity_id: int
+    static_grid: bool
     grid_name: str
     owner_id: int
     faction_tag: Optional[str]
     pilot: Optional[str] = None
 
-class Grid_PositionsCreate(BaseModel):
+class GridPositions_Create(BaseModel):
     grid_uuid: str
     x: float
     y: float
     z: float
 
-class Grid_PositionsRead(BaseModel):
+class GridPositions_Read(BaseModel):
     grid_uuid: str
     x: float
     y: float
     z: float
     created_at: Optional[datetime]
 
-class Latest_PositionsRead(BaseModel):
+class LatestPositions_Read(BaseModel):
     uuid: str
     grid_name: str
     x: float

@@ -3,20 +3,20 @@ from sqlmodel import select, join, func
 from datetime import datetime
 
 from backend.models.grids import Grids, Grid_Positions
-from backend.schemas.grids import GridsCreate, GridsRead, Grid_PositionsRead, Grid_PositionsCreate, Latest_PositionsRead
+from backend.schemas.grids import Grids_Create, Grids_Read, GridPositions_Read, GridPositions_Create, LatestPositions_Read
 from backend.db.db_manager import DatabaseHandler
 
 router = APIRouter()
 db = DatabaseHandler()
 
-@router.get("/api/v1/grids/", response_model=list[GridsRead], tags="grids")
+@router.get("/api/v1/grids/", response_model=list[Grids_Read], tags="grids")
 async def get_grids(id: int | None, name: str | None, owner: str | None, faction: str | None):
     with db.get_session() as session:
         grids = session.exec(select(Grids)).all()
         return grids
     
-@router.post("/api/v1/grids/", response_model=list[GridsRead], tags="grids")
-async def create_grids(grid_list: list[GridsCreate]):
+@router.post("/api/v1/grids/", response_model=list[Grids_Read], tags="grids")
+async def create_grids(grid_list: list[Grids_Create]):
 
     grids = [Grids(**grid_data.model_dump(exclude_unset=True)) for grid_data in grid_list]
 
@@ -30,22 +30,28 @@ async def create_grids(grid_list: list[GridsCreate]):
         print(e)
     
 
-@router.get("/api/v1/grid_positions/", response_model=list[Grid_PositionsRead], tags="grid_positions")
+@router.get("/api/v1/grid_positions/", response_model=list[GridPositions_Read], tags="grid_positions")
 async def get_positions(grid_id: int | None, timestamp: datetime | None):
     with db.get_session() as session:
         positions = session.exec(select(Grid_Positions)).all()
         return positions
 
-@router.post("/api/v1/grid_positions/", response_model=list[Grid_PositionsRead], tags="grid_positions")
-async def create_positions(position_list: list[Grid_PositionsCreate]):
+@router.post("/api/v1/grid_positions/", response_model=list[GridPositions_Read], tags="grid_positions", status_code=201)
+async def create_positions(position_list: list[GridPositions_Create]):
 
     positions = [Grid_Positions(**position_data.model_dump(exclude_unset=True)) for position_data in position_list]
 
     with db.get_session() as session:
-        session.add_all(positions)
-        session.commit()
-        for position in positions: session.refresh(position)
-        return positions
+        try:
+            session.add_all(positions)
+            session.commit()
+            for position in positions: session.refresh(position)
+            return positions
+        
+        except Exception as e:
+            print(e)
+            return HTTPException
+        
     
 # @router.get("/api/v1/grid_positions/latest/", response_model=list[Grid_PositionRead], tags="grid_positions")
 # async def get_latest_position():
@@ -56,7 +62,7 @@ async def create_positions(position_list: list[Grid_PositionsCreate]):
 #         positions = session.exec(statement).all()
 #         return positions
     
-@router.get("/api/v1/grid_positions/latest/", response_model=list[Latest_PositionsRead], tags=["grid_positions"])
+@router.get("/api/v1/grid_positions/latest/", response_model=list[LatestPositions_Read], tags=["grid_positions"])
 async def get_latest_positions():
     with db.get_session() as session:
         g = Grids

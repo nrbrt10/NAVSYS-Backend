@@ -2,7 +2,7 @@ from sqlmodel import create_engine, Session, SQLModel
 import os
 
 from backend import config
-from backend.models import grids, combat_events
+from backend.models import grids, combat_events, world
 
 class DatabaseHandler:
     def __init__(self):
