@@ -7,12 +7,10 @@ from backend.services.gpsdata_service import process_gpsdata
 
 router = APIRouter()
 
-@router.post("/api/v1/gps/", response_model=list[GPSData])
+@router.post("/api/v1/gps/")
 async def create_gps(gps_list: list[GPSData]):
-    
-    gpsdata = [GPSData(**data) for data in gps_list]
 
     try:
-        process_gpsdata(gpsdata)
+        process_gpsdata(gps_list)
     except Exception as e:
         raise HTTPException(status_code=404)

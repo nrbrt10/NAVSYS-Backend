@@ -1,12 +1,12 @@
 from . import BaseModel, Optional, datetime
 
 class DxInstance_All(BaseModel):
-    id: int
+    id: str
     name: str
     x: float
     y: float
     z: float
-    radius: float
+    radius: Optional[float] = None
     gps: str
 
 class PointsOfInterest_Create(BaseModel):

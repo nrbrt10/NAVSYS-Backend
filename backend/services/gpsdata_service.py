@@ -1,47 +1,51 @@
 from backend.schemas.gpsdata import GPSData
-from backend.schemas.world import DxInstance_All, PointsOfInterest_Create
+from backend.models.world import DxInstance, PointsOfInterest
 
 from backend.services.world_service import create_dx, create_poi
+from fastapi import HTTPException
 
-def decode_gps_string(gps: str):
+def decode_gps_string(gps: str, radius: float):
     import re
 
-    data = gps.split(':')
+    data = gps.split(r':')
     gps_data = {
-        'name': data[1],
+        'description': data[1],
         'x': data[2],
         'y': data[3],
-        'z': data[4]
+        'z': data[4],
+        'gps' : gps
     }
 
-    label = data[6] if len(data) == 7 else None
+    label = data[6] if len(data) >= 7 else None
+    is_dx = re.search(r'(DX\d)', label) if label is not None else None
+    if is_dx:
+        gps_data['name'] = str(is_dx.group(1)).lower()
   
-    match = re.search(r'R:(\d+)km', gps_data.get('name', ''))
-    if match:
-        gps_data['radius'] = int(match.group(1)) * 1000
+    has_radius = re.search(r'R(\d+)km', gps_data.get('description', ''))
+    if has_radius:
+        gps_data['radius'] = int(has_radius.group(1)) * 1000
     else:
-        gps_data['radius'] = None
-    
+        gps_data['radius'] = radius
     return gps_data
 
 def partitionby_type(decoded_gps: list[tuple[str, dict]]):
-    dx = [DxInstance_All(**gps[1]) for gps in decoded_gps if gps[0] == 'dx']
-    poi = [PointsOfInterest_Create(**gps[1]) for gps in decoded_gps if gps[0] == 'poi']
-
+    dx = [DxInstance(**gps[1]) for gps in decoded_gps if gps[0] == 'dx']
+    
+    poi = [PointsOfInterest(**gps[1]) for gps in decoded_gps if gps[0] == 'poi']
+    
     return dx, poi
 
 def process_gpsdata(data: list[GPSData]):
-    decoded_gps = [(obj.type, decode_gps_string(obj.gps)) for obj in data]
+    decoded_gps = [(obj.type, decode_gps_string(obj.gps, obj.radius)) for obj in data]
     dx, poi = partitionby_type(decoded_gps)
 
     try:
         if len(dx) > 0:
             create_dx(dx)
-
         if len(poi) > 0:
             create_poi(poi)
     except Exception as e:
-        print(e)
+        raise HTTPException(e)
 
     return 0
 
