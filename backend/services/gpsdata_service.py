@@ -1,8 +1,15 @@
+from fastapi import HTTPException
+from pydantic import BaseModel
+from typing import Optional
+
 from backend.schemas.gpsdata import GPSData
 from backend.models.world import DxInstance, PointsOfInterest
-
+from backend.schemas.world import DxInstance_Read, PointsOfInterest_Read
 from backend.services.world_service import create_dx, create_poi
-from fastapi import HTTPException
+
+class Response(BaseModel):
+    dx: Optional[list[DxInstance_Read]] = None
+    pois: Optional[list[PointsOfInterest_Read]] = None
 
 def decode_gps_string(gps: str, radius: float):
     import re
@@ -40,53 +47,13 @@ def process_gpsdata(data: list[GPSData]):
     dx, poi = partitionby_type(decoded_gps)
 
     try:
-        if len(dx) > 0:
-            create_dx(dx)
-        if len(poi) > 0:
-            create_poi(poi)
+        dx_models = create_dx(dx) if len(dx) > 0 else None
+            
+        pois_models = create_poi(poi)if len(poi) > 0 else None
+            
+        return Response(dx=dx_models, pois=pois_models)
+
     except Exception as e:
-        raise HTTPException(e)
+        raise HTTPException(status_code=500, detail=(str(e)))
 
-    return 0
-
-""" def __process_gpsdata(gps: list[GPSData]): #to be superseded?
-    decoded_gps = [(gps_obj, decode_gps(gps_obj)) for gps_obj in gpsdata]
-    assigned_gpsdata = [assign_xyz(gpsdata[0], gpsdata[1]) for gpsdata in decoded_gps]
-
-    dx, poi = partitionby_type(assigned_gpsdata)
-
-    try:
-        if len(dx) > 0:
-            create_dx(dx)
-
-        if len(poi) > 0:
-            create_poi(poi)
-    except Exception as e:
-        print(e)
-
-def __process_gpsdata2(gpsdata: list[GPSData]):
-    gpsdata_with_xyz = (
-        assign_xyz(gps, decoded)
-        for gps, decoded in (
-            (gpsdata_obj, decode_gps(gpsdata_obj)) for gpsdata_obj in gpsdata
-            )
-        )
     
-    dx, poi = partitionby_type(list(gpsdata_with_xyz))
-
-    try:
-        if len(dx) > 0:
-            dx_models = create_dx(dx)
-
-        if len(poi) > 0:
-            poi_models = create_poi(poi)
-        
-        if dx_models and poi_models:
-            return dx_models, poi_models
-        elif dx_models and not poi_models:
-            return dx_models, None
-        elif not dx_models and poi_models:
-            return None, poi_models
-        
-    except Exception as e:
-        print(e) """

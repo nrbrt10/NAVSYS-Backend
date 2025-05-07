@@ -6,7 +6,7 @@ import re
 class GPSData(BaseModel):
     type: Literal['dx', 'poi']
     gps: str = Field(pattern=r"^(GPS:)+(.*:)")
-    radius: Optional[float] = None
+    radius: Optional[float] = Field(default=None, gt=0)
 
     @model_validator(mode='after')
     def validate_input(self):

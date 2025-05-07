@@ -13,7 +13,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(signals.router)
 app.include_router(grids.router)
 app.include_router(gps.router)
 

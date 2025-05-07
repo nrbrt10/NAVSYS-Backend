@@ -1,10 +1,10 @@
 from fastapi import HTTPException
-from backend.schemas.world import DxInstance_All, PointsOfInterest_Create
+from backend.models.world import DxInstance, PointsOfInterest
 
 from backend.db.db_manager import DatabaseHandler
 db = DatabaseHandler()
 
-def create_dx(dx_instances: list[DxInstance_All]):
+def create_dx(dx_instances: list[DxInstance]):
     try:
         dx_instances = db.batch_insert(dx_instances)
         return dx_instances
@@ -12,7 +12,7 @@ def create_dx(dx_instances: list[DxInstance_All]):
         print(e)
             
 
-def create_poi(pois: list[PointsOfInterest_Create]):
+def create_poi(pois: list[PointsOfInterest]):
     try:
         pois = db.batch_insert(pois)
         return pois
