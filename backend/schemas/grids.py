@@ -34,8 +34,7 @@ class GridPositions_Read(BaseModel):
 class LatestPositions_Read(BaseModel):
     uuid: str
     grid_name: str
-    x: float
-    y: float
-    z: float
+    faction_tag: str
+    position: dict[str, float]
     created_at: Optional[datetime]
     

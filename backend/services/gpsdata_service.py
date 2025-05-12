@@ -16,23 +16,26 @@ def decode_gps_string(gps: str, radius: float):
 
     data = gps.split(r':')
     gps_data = {
-        'description': data[1],
+        'name': data[1],
         'x': data[2],
         'y': data[3],
         'z': data[4],
+        'color': data[5],
         'gps' : gps
     }
 
     label = data[6] if len(data) >= 7 else None
     is_dx = re.search(r'(DX\d)', label) if label is not None else None
     if is_dx:
-        gps_data['name'] = str(is_dx.group(1)).lower()
+        gps_data['dx'] = str(is_dx.group(1)).lower()
   
-    has_radius = re.search(r'R(\d+)km', gps_data.get('description', ''))
+    has_radius = re.search(r'R(\d+)km', gps_data.get('name', ''))
     if has_radius:
         gps_data['radius'] = int(has_radius.group(1)) * 1000
-    else:
+    elif radius:
         gps_data['radius'] = radius
+    else:
+        gps_data['radius'] = 1000
     return gps_data
 
 def partitionby_type(decoded_gps: list[tuple[str, dict]]):

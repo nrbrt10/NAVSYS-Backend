@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import signals, grids, gps
+from .routers import signals, grids, gps, world
 
 app = FastAPI()
 
@@ -15,8 +15,9 @@ app.add_middleware(
 
 app.include_router(grids.router)
 app.include_router(gps.router)
+app.include_router(world.router)
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hi FastAPI."}
+    return {"message": "NAVSYS"}
