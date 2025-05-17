@@ -6,8 +6,8 @@ from sqlalchemy.exc import IntegrityError
 from backend import config
 from backend.models import grids, combat_events, world
 
-db_name = os.getenv('DB_NAME')
-db_dir = os.getenv('DB_DIR')
+db_name = os.getenv('DB_NAME') if os.getenv('DB_NAME') is not None else config.DB_NAME
+db_dir = os.getenv('DB_DIR') if os.getenv('DB_DIR') is not None else config.DB_DIR
 
 class DatabaseHandler:
     def __init__(self):

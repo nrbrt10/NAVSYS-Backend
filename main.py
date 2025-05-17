@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import signals, grids, gps, world
+from backend.routers import signals, grids, gps, world
 
 app = FastAPI()
 
