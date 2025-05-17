@@ -4,7 +4,7 @@ from datetime import datetime
 
 from backend.schemas.world import DxInstance_Read, PointsOfInterest_Read
 from backend.schemas.gpsdata import GPSData
-from backend.services.gpsdata_service import process_gpsdata
+from backend.services.gpsdata_service import normalize_gps_data
 
 router = APIRouter()
 
@@ -12,6 +12,6 @@ router = APIRouter()
 async def create_gps(gps_list: list[GPSData]):
 
     try:
-        process_gpsdata(gps_list)
+        normalize_gps_data(gps_list)
     except Exception as e:
         raise HTTPException(status_code=404)

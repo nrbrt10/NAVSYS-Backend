@@ -1,3 +1,4 @@
+import re
 from fastapi import HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -12,9 +13,10 @@ class Response(BaseModel):
     pois: Optional[list[PointsOfInterest_Read]] = None
 
 def decode_gps_string(gps: str, radius: float):
-    import re
 
-    data = gps.split(r':')
+    data = gps.split(':')
+    if len(data) < 6:
+        raise ValueError(f'Malformed GPS string: {gps}')
     gps_data = {
         'name': data[1],
         'x': data[2],
@@ -38,25 +40,23 @@ def decode_gps_string(gps: str, radius: float):
         gps_data['radius'] = 1000
     return gps_data
 
-def partitionby_type(decoded_gps: list[tuple[str, dict]]):
-    dx = [DxInstance(**gps[1]) for gps in decoded_gps if gps[0] == 'dx']
+def partition_by_type(decoded_gps: list[tuple[str, dict]]):
+    dx = [DxInstance(**data) for type, data in decoded_gps if type == 'dx']
     
-    poi = [PointsOfInterest(**gps[1]) for gps in decoded_gps if gps[0] == 'poi']
+    poi = [PointsOfInterest(**data) for type, data in decoded_gps if type == 'poi']
     
     return dx, poi
 
-def process_gpsdata(data: list[GPSData]):
+def normalize_gps_data(data: list[GPSData]):
     decoded_gps = [(obj.type, decode_gps_string(obj.gps, obj.radius)) for obj in data]
-    dx, poi = partitionby_type(decoded_gps)
+    dx, poi = partition_by_type(decoded_gps)
 
     try:
         dx_models = create_dx(dx) if len(dx) > 0 else None
-            
+
         pois_models = create_poi(poi)if len(poi) > 0 else None
             
         return Response(dx=dx_models, pois=pois_models)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=(str(e)))
-
-    
+        raise HTTPException(status_code=500, detail=str(e))

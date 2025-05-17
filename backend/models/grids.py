@@ -6,11 +6,13 @@ class Grids(SQLModel, table=True):
     static_grid: bool = Field(default=False)
     grid_name: str
     owner_id: str
+    iff_id: str
     faction_tag: Optional[str] = Field(default=None)
     pilot: Optional[str] = Field(default=None)
     created_at: Optional[datetime] = Field(
         sa_column=Column(String, server_default=text("datetime()"))
     )
+    
     
 
 class Grid_Positions(SQLModel, table=True):
@@ -22,3 +24,7 @@ class Grid_Positions(SQLModel, table=True):
     created_at: Optional[datetime] = Field(
         sa_column=Column(String, server_default=text("datetime()"))
     )
+    
+    @property
+    def position(self) -> dict:
+        return {'x': self.x, 'y': self.y, 'z': self.z}

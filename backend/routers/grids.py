@@ -48,7 +48,7 @@ async def get_positions(
         positions = session.exec(statement).all()
         return positions
 
-@router.post("/api/v1/grid_positions/", response_model=list[GridPositions_Read], tags="grid_positions", status_code=201)
+@router.post("/api/v1/grid_positions/", tags="grid_positions", status_code=201)
 async def create_positions(position_list: list[GridPositions_Create]):
 
     positions = [Grid_Positions(**position_data.model_dump(exclude_unset=True)) for position_data in position_list]
@@ -84,6 +84,8 @@ async def get_latest_positions():
             select(
                 Grids.uuid,
                 Grids.grid_name,
+                Grids.faction_tag,
+                Grids.iff_id,
                 Grid_Positions.x,
                 Grid_Positions.y,
                 Grid_Positions.z,
@@ -94,16 +96,18 @@ async def get_latest_positions():
                         (subq.c.latest_ts == Grid_Positions.created_at))
         )
 
-        results = session.exec(query).all()
+        results = session.exec(query).mappings().all()
+
+        print(results)
 
         return [
-            {
-                "uuid": row[0],
-                "grid_name": row[1],
-                "x": row[2],
-                "y": row[3],
-                "z": row[4],
-                "created_at": row[5]
-            }
+            LatestPositions_Read(
+                uuid=row.uuid,
+                grid_name=row.grid_name,
+                faction_tag=row.faction_tag,
+                iff_id=row.iff_id,
+                position={"x": row.x, "y": row.y, "z": row.z},
+                created_at=row.created_at
+            )
             for row in results
         ]

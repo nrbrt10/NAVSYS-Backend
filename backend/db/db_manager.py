@@ -6,9 +6,12 @@ from sqlalchemy.exc import IntegrityError
 from backend import config
 from backend.models import grids, combat_events, world
 
+db_name = os.getenv('DB_NAME')
+db_dir = os.getenv('DB_DIR')
+
 class DatabaseHandler:
     def __init__(self):
-        db_path = os.path.join(config.DB_DIR, config.DB_NAME).replace("\\", "/")
+        db_path = os.path.join(db_dir, db_name).replace("\\", "/")
         self.db_url = f"sqlite:///{db_path}"
         self.engine = create_engine(self.db_url, echo=True)
 

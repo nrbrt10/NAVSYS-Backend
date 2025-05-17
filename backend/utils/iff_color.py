@@ -1,0 +1,14 @@
+def assign_iff_color(iff_id):
+    match iff_id:
+        case 'Enemies':
+            return '#fc0303'
+        case 'Owner':
+            return '#24fc03'
+        case 'FactionShare':
+            return '#24fc03'
+        case 'Neutral':
+            return '#fcf803'
+        case 'NoOwnership':
+            return '#fcf803'
+        case _:
+            return '#fc0303'

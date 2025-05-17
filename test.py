@@ -19,8 +19,8 @@ print(response.json())
 response
 
 data = [
-    {"uuid":"129448123554376162_144115188075855895_Sudentor MK1.7.3 Dawson CS","entity_id":129448123554376162,"grid_name":"Sudentor MK1.7.3 Dawson CS","owner_id":144115188075855895,"faction_tag":"PBC"},
-    {"uuid":"96113300194743417_144115188075855895_Large Grid 5409","entity_id":96113300194743417,"grid_name":"Large Grid 5409","owner_id":144115188075855895,"faction_tag":"PBC"}
+    {"uuid":"129448123554376162_144115188075855895_Sudentor MK1.7.3 Dawson CS","entity_id":129448123554376162,"static_grid": "false","grid_name":"Sudentor MK1.7.3 Dawson CS","owner_id":144115188075855895,"faction_tag":"PBC"},
+    {"uuid":"96113300194743417_144115188075855895_Large Grid 5409","entity_id":96113300194743417,"static_grid": "false","grid_name":"Large Grid 5409","owner_id":144115188075855895,"faction_tag":"PBC"}
     ]
 
 url = "http://127.0.0.1:8000/api/v1/grids/"
@@ -47,7 +47,7 @@ data = [
 {"type": "poi", "gps": "GPS:Europa KOTH:404015.47:-3195511.14:108837.6:#5eeb341E:"},
 {"type": "poi", "gps": "GPS:Europa:400000:-3200000:100000:#b0a99934:", "radius": 10500},
 {"type": "poi", "gps": "GPS:Ganymede Botanical:-404041.3:-3093957.08:-285675.6:#5eeb341E:"},
-{"type": "poi", "gps": "GPS:Ganymede:-400000:-3100000:-300000:#5251501E:", "radius": 17500},
+{"type": "poi", "gps": "GPS:Ganymede:-400000:-3100000:-300000:#aeb0a91E:", "radius": 17500},
 {"type": "dx", "gps": "GPS:Greek Cluster - (R400km):-1600000:-2700000:-334490:#FFFFFF00:DX2:"},
 {"type": "poi", "gps": "GPS:Greek Cluster Waystation:-1380846.75:-2582155.58:-302303.08:#5eeb341E:"},
 {"type": "dx", "gps": "GPS:Inner High Speed Zone - (R2750km):0:-1725000:100000:#FFFFFF00:DX5:"},
@@ -64,7 +64,7 @@ data = [
 {"type": "poi", "gps": "GPS:Miller Mobile Construction Barge:-9605.07:2310850.71:122318.61:#FFF17575:Nation HQs:"},
 {"type": "dx", "gps": "GPS:P1 - (R300km):-800000:-1550000:0:#FFFFFF00:DX2:"},
 {"type": "dx", "gps": "GPS:Pallas - (R300km):0:-1725000:100000:#FFFFFF00:DX2:"},
-{"type": "poi", "gps": "GPS:Pallas:0:-1725000:100000:#52515000:", "radius": 14000},
+{"type": "poi", "gps": "GPS:Pallas:0:-1725000:100000:#aeb0a900:", "radius": 14000},
 {"type": "poi", "gps": "GPS:Pallas Station:-3296:-1727232:76613:#5eeb341E:"},
 {"type": "poi", "gps": "GPS:Phobos:650000:-650000:-250000:#b0a99934:", "radius": 4400},
 {"type": "poi", "gps": "GPS:Rhea:2700000:1800000:100000:#b0a99934:", "radius": 9000},
@@ -83,7 +83,7 @@ data = [
 {"type": "poi", "gps": "GPS:Uranus:-4200000:3000000:-250000:#0ba6b834:", "radius": 80000},
 {"type": "dx", "gps": "GPS:Vesta - (R300km):-1400000:1000000:-50000:#FFFFFF00:DX2:"},
 {"type": "poi", "gps": "GPS:Vesta Station:-1412860:986040:-49577:#5eeb341E:"},
-{"type": "poi", "gps": "GPS:Vesta:-1400000:1000000:-50000:#5251501E:", "radius": 28000}
+{"type": "poi", "gps": "GPS:Vesta:-1400000:1000000:-50000:#aeb0a91E:", "radius": 28000}
 ]
 
 url = "http://127.0.0.1:8000/api/v1/gps/"
