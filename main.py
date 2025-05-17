@@ -21,3 +21,7 @@ app.include_router(world.router)
 @app.get("/")
 async def root():
     return {"message": "NAVSYS"}
+
+@app.get("/render")
+async def render_health_check():
+    return {"status": "ok"}
