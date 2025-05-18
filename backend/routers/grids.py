@@ -11,7 +11,12 @@ router = APIRouter()
 db = DatabaseHandler()
 
 @router.get("/api/v1/grids/", response_model=list[Grids_Read], tags="grids")
-async def get_grids(id: int | None, name: str | None, owner: str | None, faction: str | None):
+async def get_grids(
+    id: Optional[int] = Query(None, alias="id"),
+    name: Optional[str] = Query(None, alias="name"),
+    owner: Optional[str] = Query(None, alias="owner"),
+    faction: Optional[str] = Query(None, alias="faction"),
+    ):
     with db.get_session() as session:
         grids = session.exec(select(Grids)).all()
         return grids

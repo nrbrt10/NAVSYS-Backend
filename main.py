@@ -7,7 +7,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (ok for development)
+    allow_origins=["https://navsys-frontend.vercel.app"],  # Allow all origins (ok for development)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
