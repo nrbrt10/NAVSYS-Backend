@@ -1,1 +1,1 @@
-Backend prototype to gather ingame data from Space Engineers client.
+Backend prototype to gather ingame data from the Space Engineers client.
