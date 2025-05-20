@@ -5,9 +5,14 @@ from backend.routers import signals, grids, gps, world
 
 app = FastAPI()
 
+origins = [
+    'https://navsys-frontend.vercel.app', 
+    'http://localhost:5173'
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://navsys-frontend.vercel.app"],  # Allow all origins (ok for development)
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,7 +25,7 @@ app.include_router(world.router)
 
 @app.get("/")
 async def root():
-    return {"message": "NAVSYS"}
+    return {"message": "OK"}
 
 @app.get("/render")
 async def render_health_check():
